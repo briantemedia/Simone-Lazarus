@@ -571,9 +571,15 @@
             h1 { font-size: 3.5rem; }
             h2 { font-size: 2.2rem; }
             section { padding: 80px 0; }
+            .header {
+                width: calc(100% - 40px);
+                top: 20px;
+            }
             .navbar {
                  display: flex;
                  justify-content: space-between;
+                 padding: 10px 15px;
+                 border-radius: 50px;
             }
             .nav-menu, .nav-cta {
                 display: none;
@@ -582,49 +588,59 @@
                 display: block;
                 z-index: 1001;
             }
-        }
-        
-        @media (max-width: 768px) {
-            .header {
-                width: 100%;
-                top: 0;
-                padding: 0 10px;
-            }
-            .navbar {
-                 border-radius: 0;
-            }
             .nav-menu-mobile {
-                display: flex; /* Nur auf Mobile anzeigen */
+                display: flex;
                 position: fixed;
                 left: -100%;
                 top: 0;
                 flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                background: rgba(255, 255, 255, 0.95);
+                justify-content: flex-start;
+                align-items: flex-start;
+                background: rgba(247, 247, 247, 0.8);
                 backdrop-filter: blur(10px);
                 width: 100%;
                 height: 100%;
-                text-align: center;
-                transition: 0.4s ease;
-                gap: 25px;
-                padding: 20px;
+                transition: left 0.4s ease;
                 z-index: 1000;
+                padding: 120px 40px 40px 40px;
             }
-
+             .nav-menu-mobile ul {
+                list-style: none;
+             }
             .nav-menu-mobile.active {
                 left: 0;
             }
-
             .mobile-nav-link {
                 color: var(--text-color);
-                font-size: 1.8rem;
+                font-size: 2rem;
                 font-weight: 500;
+                margin-bottom: 15px;
+                display: block;
+            }
+            .mobile-menu-header {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                right: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: white;
+                border-radius: 50px;
+                padding: 10px 15px;
+                box-shadow: var(--shadow);
+            }
+            .close-menu {
+                font-size: 2.5rem;
+                line-height: 1;
+                font-weight: 300;
+                color: var(--text-color);
+                cursor: pointer;
             }
 
-            .hamburger.active .bar:nth-child(2) { opacity: 0; }
-            .hamburger.active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-            .hamburger.active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+            .hamburger {
+                position: static;
+            }
 
             #about .about-content { grid-template-columns: 1fr; gap: 40px; }
             .qualifications-list { grid-template-columns: 1fr; }
@@ -665,11 +681,6 @@
                 <h1>Finden Sie Ihren Weg</h1>
                 <p>Begleitung und Unterstützung für ein erfülltes und glückliches Leben.</p>
                 <a href="#cta" class="btn">Jetzt Kontakt aufnehmen</a>
-            </div>
-            <div class="wave-divider bottom">
-                <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                    <path d="M0,90 C300,20 900,20 1200,90 L1200,120 L0,120 Z" style="fill: var(--background-light);"></path>
-                </svg>
             </div>
         </section>
 
@@ -832,18 +843,25 @@
             const hamburger = document.querySelector('.hamburger');
             
             // Create mobile menu and append it to body
-            const mobileMenu = document.createElement('ul');
+            const mobileMenu = document.createElement('div');
             mobileMenu.className = 'nav-menu-mobile';
             mobileMenu.innerHTML = `
-                <li class="nav-item"><a href="#about" class="mobile-nav-link">Über Mich</a></li>
-                <li class="nav-item"><a href="#" class="mobile-nav-link">Psychotherapie</a></li>
-                <li class="nav-item"><a href="#" class="mobile-nav-link">Hypnosetherapie</a></li>
-                <li class="nav-item"><a href="#" class="mobile-nav-link">Honorar</a></li>
-                <li class="nav-item"><a href="#" class="mobile-nav-link">Aktuelles</a></li>
-                <li class="nav-item"><a href="#cta" class="mobile-nav-link">Kontakt</a></li>
+                <div class="mobile-menu-header">
+                    <a href="#hero" class="nav-logo">Simone Lazarus</a>
+                    <div class="close-menu">&times;</div>
+                </div>
+                <ul>
+                    <li class="nav-item"><a href="#about" class="mobile-nav-link">Über Mich</a></li>
+                    <li class="nav-item"><a href="#" class="mobile-nav-link">Psychotherapie</a></li>
+                    <li class="nav-item"><a href="#" class="mobile-nav-link">Hypnosetherapie</a></li>
+                    <li class="nav-item"><a href="#" class="mobile-nav-link">Honorar</a></li>
+                    <li class="nav-item"><a href="#" class="mobile-nav-link">Aktuelles</a></li>
+                    <li class="nav-item"><a href="#cta" class="mobile-nav-link">Kontakt</a></li>
+                </ul>
             `;
             document.body.appendChild(mobileMenu);
 
+            const closeMenuBtn = mobileMenu.querySelector('.close-menu');
             const allMobileNavLinks = document.querySelectorAll('.mobile-nav-link');
 
             // Header Scroll-Effekt
@@ -857,6 +875,12 @@
                 }
                 lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
             });
+            
+            function closeMobileMenu() {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            }
 
             // Hamburger Menü Toggle
             hamburger.addEventListener('click', () => {
@@ -864,15 +888,11 @@
                 mobileMenu.classList.toggle('active');
                 document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
             });
+            
+            closeMenuBtn.addEventListener('click', closeMobileMenu);
 
             // Menü schließen bei Klick auf einen Link
-            allMobileNavLinks.forEach(link => link.addEventListener('click', (e) => {
-                 if(mobileMenu.classList.contains('active')){
-                    hamburger.classList.remove('active');
-                    mobileMenu.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            }));
+            allMobileNavLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
             
             // Intersection Observer für Fade-In Animationen
             const sections = document.querySelectorAll('.fade-in-section');
